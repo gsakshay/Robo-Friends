@@ -5,7 +5,7 @@ import Scroll from '../components/Scroll';
 import './App.css';
 import Button from "@material-ui/core/Button";
 import Modal from '@material-ui/core/Modal';
-import AddCircleIcon from '@material-ui/icons/Add';
+import { v4 as uuidv4 } from "uuid";
 
 class App extends Component {
   constructor() {
@@ -40,11 +40,11 @@ class App extends Component {
     addRobot = () => {
      const {newName:name,newEmail:email} = this.state;
      console.log(this.state.robots)
-     const newUser={
-       id:++this.state.id,
-       name:name,
-       email:email
-     }
+     const newUser = {
+       id: uuidv4(),
+       name: name,
+       email: email,
+     };
      this.setState({
       robots:[...this.state.robots,newUser]
      })
