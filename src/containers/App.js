@@ -4,13 +4,19 @@ import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
 import './App.css';
 import Button from "@material-ui/core/Button";
+import Modal from '@material-ui/core/Modal';
+import AddCircleIcon from '@material-ui/icons/Add';
 
 class App extends Component {
   constructor() {
     super()
     this.state = {
       robots: [],
-      searchfield: ''
+      searchfield: '',
+      open:false,
+      newName:"",
+      newEmail:"",
+      id:10
     }
   }
 
@@ -24,15 +30,66 @@ class App extends Component {
     this.setState({ searchfield: event.target.value })
   }
 
+  toggleOpen = () => {
+      console.log("workingg")
+      this.setState(
+      { open:!this.state.open }
+    );
+    }
+    
+    addRobot = () => {
+     const {newName:name,newEmail:email} = this.state;
+     console.log(this.state.robots)
+     const newUser={
+       id:++this.state.id,
+       name:name,
+       email:email
+     }
+     this.setState({
+      robots:[...this.state.robots,newUser]
+     })
+     this.toggleOpen()
+    }
+ 
   render() {
     const { robots, searchfield } = this.state;
     const filteredRobots = robots.filter(robot =>{
       return robot.name.toLowerCase().includes(searchfield.toLowerCase());
     })
+ 
     return !robots.length ? (
       <h1>Loading</h1>
     ) : (
       <div className="tc">
+        <Modal open={this.state.open} onClose={this.toggleOpen}>
+          <form className="tc">
+            <input
+              type="text"
+              name="name"
+              placeholder="name"
+              onChange={(event) => {
+                this.setState({
+                  newName: event.target.value,
+                });
+              }}
+              value={this.state.newName}
+            />
+            <input
+              type="text"
+              name="email"
+              placeholder="email"
+              onChange={(event) => {
+                this.setState({
+                  newEmail: event.target.value,
+                });
+              }}
+              value={this.state.newEmail}
+            />
+            <Button variant="contained" color="primary" onClick={this.addRobot}>
+              Add
+            </Button>
+          </form>
+        </Modal>
         <h1 className="f1">RoboFriends</h1>
         <div className="tc">
           <SearchBox
@@ -46,6 +103,7 @@ class App extends Component {
             }}
             variant="outlined"
             color="inherit"
+            onClick={this.toggleOpen}
           >
             ADD ROBOT
           </Button>
