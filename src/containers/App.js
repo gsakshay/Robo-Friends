@@ -49,6 +49,10 @@ class App extends Component {
       robots:[...this.state.robots,newUser]
      })
      this.toggleOpen()
+     this.setState({
+       newName: "",
+       newEmail: ""
+     });
     }
  
   render() {
