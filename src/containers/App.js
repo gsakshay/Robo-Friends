@@ -6,32 +6,39 @@ import './App.css';
 import Button from "@material-ui/core/Button";
 import Modal from '@material-ui/core/Modal';
 import { v4 as uuidv4 } from "uuid";
+import { connect } from "react-redux";
+import { searchChange,addRobot,fetchRobots } from "../redux/actions";
 
+const mapStatesToProps = state => {
+  return{
+    searchfield:state.searchField,
+    robots:state.robots,
+    isLoading:state.isLoading,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return{
+  onSearchChange:(event)=>{dispatch(searchChange(event.target.value))},  
+  addRobot:(user)=>{dispatch(addRobot(user))},
+  fetchRobots:()=>{dispatch(fetchRobots())},
+  }
+}
 class App extends Component {
   constructor() {
     super()
     this.state = {
-      robots: [],
-      searchfield: '',
       open:false,
       newName:"",
-      newEmail:"",
-      id:10
+      newEmail: ""
     }
-  }
+  }6
 
   componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(response=> response.json())
-      .then(users => {this.setState({ robots: users})});
-  }
-
-  onSearchChange = (event) => {
-    this.setState({ searchfield: event.target.value })
+    this.props.fetchRobots();
   }
 
   toggleOpen = () => {
-      console.log("workingg")
       this.setState(
       { open:!this.state.open }
     );
@@ -39,30 +46,34 @@ class App extends Component {
     
     addRobot = () => {
      const {newName:name,newEmail:email} = this.state;
-     console.log(this.state.robots)
-     const newUser = {
-       id: uuidv4(),
-       name: name,
-       email: email,
-     };
-     this.setState({
-      robots:[...this.state.robots,newUser]
-     })
-     this.toggleOpen()
-     this.setState({
-       newName: "",
-       newEmail: ""
-     });
+     if(this.state.newName === "" || this.state.newEmail === ""){
+       alert("Please enter Name and Email to add your avatar")
+      this.toggleOpen();
+     }
+     else{
+        const newUser = {
+          id: uuidv4(),
+          name: name,
+          email: email,
+        }
+        this.props.addRobot(newUser);
+        this.toggleOpen();
+        this.setState({
+          newName: "",
+          newEmail: "",
+        });
+     }
+     
     }
  
   render() {
-    const { robots, searchfield } = this.state;
+    const { searchfield,robots } = this.props;
     const filteredRobots = robots.filter(robot =>{
       return robot.name.toLowerCase().includes(searchfield.toLowerCase());
     })
  
-    return !robots.length ? (
-      <h1>Loading</h1>
+    return this.props.isLoading ? (
+      <h1 style={{ textAlign: "center" }}>Loading</h1>
     ) : (
       <div className="tc">
         <Modal open={this.state.open} onClose={this.toggleOpen}>
@@ -73,10 +84,10 @@ class App extends Component {
               placeholder="name"
               onChange={(event) => {
                 this.setState({
-                  newName: event.target.value,
+                  newName: event.target.value
                 });
               }}
-              value={this.state.newName}
+              value={this.props.newName}
             />
             <input
               type="text"
@@ -84,12 +95,16 @@ class App extends Component {
               placeholder="email"
               onChange={(event) => {
                 this.setState({
-                  newEmail: event.target.value,
+                  newEmail: event.target.value
                 });
               }}
-              value={this.state.newEmail}
+              value={this.props.newEmail}
             />
-            <Button variant="contained" color="primary" onClick={this.addRobot}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.addRobot}
+            >
               Add
             </Button>
           </form>
@@ -97,8 +112,8 @@ class App extends Component {
         <h1 className="f1">RoboFriends</h1>
         <div className="tc">
           <SearchBox
-            searchfield={this.state.searchfield}
-            searchChange={this.onSearchChange}
+            searchfield={this.props.searchfield}
+            searchChange={this.props.onSearchChange}
           />
           <Button
             style={{
@@ -120,4 +135,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(mapStatesToProps,mapDispatchToProps)(App);
