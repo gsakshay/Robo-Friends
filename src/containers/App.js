@@ -36,6 +36,12 @@ class App extends Component {
 
   componentDidMount() {
     this.props.fetchRobots();
+    window.onload = function () {
+    if (localStorage.getItem("hasCodeRunBefore") === null) {
+        location.reload();
+        localStorage.setItem("hasCodeRunBefore", true);
+    }
+}
   }
 
   toggleOpen = () => {
